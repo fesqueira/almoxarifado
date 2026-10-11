@@ -77,7 +77,7 @@ A senha não fica armazenada diretamente no código.
 Clone o repositório:
 
 ```bash
-git clone https://github.com/Fesqueira/almoxarifado.git
+git clone https://github.com/fesqueira/almoxarifado.git
 ```
 
 Entre na pasta:
