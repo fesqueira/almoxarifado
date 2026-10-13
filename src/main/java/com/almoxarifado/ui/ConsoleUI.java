@@ -43,6 +43,8 @@ public class ConsoleUI {
                 }
             } catch (SQLException e) {
                 System.out.println("Erro ao acessar o banco de dados: " + e.getMessage());
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                System.out.println(e.getMessage());
             }
         }
 
