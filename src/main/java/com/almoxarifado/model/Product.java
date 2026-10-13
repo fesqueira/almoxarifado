@@ -1,14 +1,14 @@
 package com.almoxarifado.model;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class Product {
     private final UUID id;
     private String name;
+    private String category;
     private String description;
     private BigDecimal purchasePrice;
     private BigDecimal sellingPrice;
@@ -18,7 +18,7 @@ public class Product {
 
     public Product() {
         this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().withNano(0);
     }
 
     public Product(
@@ -30,7 +30,7 @@ public class Product {
             int minimumStock
     ) {
         this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = LocalDateTime.now().withNano(0);
 
         this.name = name;
         this.description = description;
@@ -60,6 +60,21 @@ public class Product {
         this.createdAt = createdAt;
     }
 
+    public Product(
+            UUID id,
+            String name,
+            String category,
+            String description,
+            BigDecimal purchasePrice,
+            BigDecimal sellingPrice,
+            int quantity,
+            int minimumStock,
+            LocalDateTime createdAt
+    ) {
+        this(id, name, description, purchasePrice, sellingPrice, quantity, minimumStock, createdAt);
+        this.category = category;
+    }
+
 
     public void addStock(int amount) {
         if (amount <= 0) {
@@ -84,8 +99,66 @@ public class Product {
         this.quantity -= amount;
     }
 
+    public boolean isOutOfStock() {
+        return this.quantity <= 0;
+    }
+
+    public boolean isLowStock() {
+        return this.quantity <= this.minimumStock;
+    }
+
+    public BigDecimal getStockCost() {
+        return this.purchasePrice.multiply(BigDecimal.valueOf(this.quantity));
+    }
+
+    public BigDecimal getStockSaleValue() {
+        return this.sellingPrice.multiply(BigDecimal.valueOf(this.quantity));
+    }
+
+    public BigDecimal getUnitProfit() {
+        return this.sellingPrice.subtract(this.purchasePrice);
+    }
+
+    // Margem sobre o preço de venda, em %. Retorna null quando não há preço de venda.
+    public BigDecimal getMarginPercent() {
+        if (this.sellingPrice.signum() <= 0) {
+            return null;
+        }
+        return getUnitProfit()
+                .multiply(BigDecimal.valueOf(100))
+                .divide(this.sellingPrice, 1, RoundingMode.HALF_UP);
+    }
+
     public String getName() {
         return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setPurchasePrice(BigDecimal purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    }
+
+    public void setSellingPrice(BigDecimal sellingPrice) {
+        this.sellingPrice = sellingPrice;
+    }
+
+    public void setMinimumStock(int minimumStock) {
+        this.minimumStock = minimumStock;
     }
 
     public String getDescription() {

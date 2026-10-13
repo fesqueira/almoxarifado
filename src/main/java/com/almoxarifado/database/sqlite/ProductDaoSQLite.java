@@ -32,11 +32,42 @@ public class ProductDaoSQLite extends AbstractProductDao{
             )
             """;
 
+        String movementsSql = """
+            CREATE TABLE IF NOT EXISTS stock_movements (
+                id TEXT PRIMARY KEY,
+                product_id TEXT NOT NULL,
+                product_name TEXT NOT NULL,
+                category TEXT,
+                reason TEXT NOT NULL,
+                quantity INTEGER NOT NULL,
+                unit_cost NUMERIC NOT NULL,
+                unit_price NUMERIC,
+                note TEXT,
+                created_at TEXT NOT NULL
+            )
+            """;
+
         try (Connection connection = getConnection();
              Statement statement = connection.createStatement()) {
 
             statement.execute(sql);
+            // Bancos criados antes da versão com categorias não têm a coluna.
+            if (!hasColumn(statement, "products", "category")) {
+                statement.execute("ALTER TABLE products ADD COLUMN category TEXT");
+            }
+            statement.execute(movementsSql);
         }
+    }
+
+    private boolean hasColumn(Statement statement, String table, String column) throws SQLException {
+        try (ResultSet resultSet = statement.executeQuery("PRAGMA table_info(" + table + ")")) {
+            while (resultSet.next()) {
+                if (column.equalsIgnoreCase(resultSet.getString("name"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     @Override
     protected LocalDateTime getCreatedAt(ResultSet resultSet)

@@ -49,3 +49,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
+### Empacotamento ###
+packaging/.cache/
